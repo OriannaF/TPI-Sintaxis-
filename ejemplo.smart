@@ -1,3 +1,5 @@
-WHEN sensor_luz < 250lux DOO
-foco_entrada.estado = ON
+EVERY 30m DO
+IF reloj.hora > 22:00 AND alarma.estado == OFF THEN
+altavoz_comedor.mensaje = "Hora de dormir"
+END
 END

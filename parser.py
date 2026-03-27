@@ -309,7 +309,7 @@ class Parser:
         partes.append("<head>")
         partes.append("  <meta charset='UTF-8'>")
         partes.append("  <meta name='viewport' content='width=device-width, initial-scale=1.0'>")
-        partes.append("  <title>Dashboard Smart Home</title>")
+        partes.append("  <title>Smart Home</title>")
         partes.append("  <style>")
         partes.append("    body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f7; }")
         partes.append("    .sensores { border: 1px solid green; padding: 20px; margin-bottom: 20px; background: #ffffff; }")
@@ -320,7 +320,7 @@ class Parser:
         partes.append("  </style>")
         partes.append("</head>")
         partes.append("<body>")
-        partes.append("  <h1>Dashboard Smart Home</h1>")
+        partes.append("  <h1>Smart Home</h1>")
 
         # Sensores
         partes.append("  <div class='sensores'>")
