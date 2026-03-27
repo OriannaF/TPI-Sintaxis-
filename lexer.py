@@ -86,9 +86,15 @@ def lexer(codigo: str) -> list[Token]:
 
         if not match:
             columna = pos - inicio_linea + 1
-            cadena_error = codigo[pos]
+
+            fin = pos
+            while fin < len(codigo) and codigo[fin] not in " \t\r\n":
+                fin += 1
+
+            cadena_error = codigo[pos:fin]
+
             raise SyntaxError(
-                f"Error léxico en línea {linea}, columna {columna}: símbolo no permitido '{cadena_error}'"
+                f"Error léxico en línea {linea}, columna {columna}: cadena no válida '{cadena_error}'"
             )
 
         tipo = match.lastgroup
