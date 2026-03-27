@@ -1,5 +1,7 @@
 import re
+import sys
 from dataclasses import dataclass
+
 
 @dataclass
 class Token:
@@ -8,20 +10,26 @@ class Token:
     linea: int
     columna: int
 
+
 TOKEN_REGEX = [
+    # comentarios y espacios
     ("COMMENT",      r"//[^\n]*"),
     ("NEWLINE",      r"\n"),
     ("SKIP",         r"[ \t\r]+"),
 
+    # operadores dobles
     ("EQ",           r"=="),
     ("NEQ",          r"!="),
     ("GE",           r">="),
     ("LE",           r"<="),
+
+    # operadores simples
     ("GT",           r">"),
     ("LT",           r"<"),
     ("ASSIGN",       r"="),
     ("DOT",          r"\."),
 
+    # literales compuestos
     ("TEMPERATURA",  r"-?\d+(?:\.\d+)?°C"),
     ("PORCENTAJE",   r"\d+(?:\.\d+)?%"),
     ("ILUMINANCIA",  r"\d+(?:\.\d+)?lux"),
@@ -31,6 +39,7 @@ TOKEN_REGEX = [
     ("EMAIL",        r"[A-Za-z0-9._+\-]+@[A-Za-z0-9._+\-]+\.[A-Za-z]{2,4}"),
     ("TEXTO",        r'"[^"\n]*"|“[^”\n]*”'),
 
+    # palabras reservadas
     ("WHEN",         r"\bWHEN\b"),
     ("IF",           r"\bIF\b"),
     ("THEN",         r"\bTHEN\b"),
@@ -41,17 +50,32 @@ TOKEN_REGEX = [
     ("AND",          r"\bAND\b"),
     ("OR",           r"\bOR\b"),
     ("NOT",          r"\bNOT\b"),
+
+    # booleanos
     ("BOOLEANO",     r"\b(?:TRUE|FALSE|ON|OFF)\b"),
 
+    # identificadores
     ("ID",           r"[A-Za-z_][A-Za-z0-9_]*"),
 ]
 
 MASTER_REGEX = re.compile(
-    "|".join(f"(?P<{name}>{pattern})" for name, pattern in TOKEN_REGEX),
+    "|".join(f"(?P<{nombre}>{patron})" for nombre, patron in TOKEN_REGEX),
     re.IGNORECASE
 )
 
-def lexer(codigo):
+
+def leer_archivo(ruta_archivo: str) -> str:
+    if not ruta_archivo.endswith(".smart"):
+        raise ValueError("Error de ejecución: el archivo debe tener extensión .smart")
+
+    try:
+        with open(ruta_archivo, "r", encoding="utf-8") as archivo:
+            return archivo.read()
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Error de ejecución: no existe el archivo '{ruta_archivo}'")
+
+
+def lexer(codigo: str) -> list[Token]:
     tokens = []
     linea = 1
     inicio_linea = 0
@@ -62,8 +86,9 @@ def lexer(codigo):
 
         if not match:
             columna = pos - inicio_linea + 1
+            cadena_error = codigo[pos]
             raise SyntaxError(
-                f"Error léxico en línea {linea}, columna {columna}: símbolo no permitido '{codigo[pos]}'"
+                f"Error léxico en línea {linea}, columna {columna}: símbolo no permitido '{cadena_error}'"
             )
 
         tipo = match.lastgroup
@@ -78,7 +103,6 @@ def lexer(codigo):
             pass
 
         else:
-            # normalizar keywords/booleanos a mayúsculas
             if tipo in {
                 "WHEN", "IF", "THEN", "ELSE", "DO", "END",
                 "EVERY", "AND", "OR", "NOT", "BOOLEANO"
@@ -92,18 +116,63 @@ def lexer(codigo):
     return tokens
 
 
-if __name__ == "__main__":
-    codigo = """
-// comentario
-WHEN sensor_luz < 250lux DO
-foco_entrada.estado = ON
-foco_entrada.brillo = 80%
-END
-"""
+def imprimir_tokens(tokens: list[Token]) -> None:
+    print(f"{'TIPO':<15} {'VALOR':<30} {'LINEA':<8} {'COLUMNA':<8}")
+    print("-" * 65)
+    for token in tokens:
+        print(f"{token.tipo:<15} {token.valor:<30} {token.linea:<8} {token.columna:<8}")
+
+
+def main():
+    if len(sys.argv) != 2:
+        print("Uso: python lexer.py archivo.smart")
+        return
+
+    ruta_archivo = sys.argv[1]
 
     try:
-        resultado = lexer(codigo)
-        for token in resultado:
-            print(token)
-    except SyntaxError as e:
+        codigo = leer_archivo(ruta_archivo)
+        tokens = lexer(codigo)
+        imprimir_tokens(tokens)
+        print("\nAnálisis léxico exitoso: archivo correctamente codificado.")
+    except (ValueError, FileNotFoundError, SyntaxError) as e:
         print(e)
+
+
+import tkinter as tk
+from tkinter import filedialog
+
+
+def seleccionar_archivo():
+    root = tk.Tk()
+    root.withdraw()  # oculta la ventana principal
+
+    archivo = filedialog.askopenfilename(
+        title="Seleccionar archivo .smart",
+        filetypes=[("Archivos SMART", "*.smart")]
+    )
+
+    return archivo
+
+
+def main():
+    try:
+        ruta_archivo = seleccionar_archivo()
+
+        if not ruta_archivo:
+            print("No se seleccionó ningún archivo.")
+            return
+
+        codigo = leer_archivo(ruta_archivo)
+        tokens = lexer(codigo)
+
+        imprimir_tokens(tokens)
+
+        print("\nAnálisis léxico exitoso.")
+
+    except (ValueError, FileNotFoundError, SyntaxError) as e:
+        print(e)
+
+
+if __name__ == "__main__":
+    main()

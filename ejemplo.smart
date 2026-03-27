@@ -1,0 +1,11 @@
+// El sensor de luz activa el foco
+WHEN sensor_luz < 250lux DO
+foco_entrada.estado = ON
+foco_entrada.brillo = 80%
+END
+
+EVERY 30m DO
+IF reloj.hora > 22:00 AND alarma.estado == OFF THEN
+altavoz_comedor.mensaje = "Hora de dormir"
+END
+END
