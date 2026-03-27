@@ -129,22 +129,38 @@ def imprimir_tokens(tokens: list[Token]) -> None:
         print(f"{token.tipo:<15} {token.valor:<30} {token.linea:<8} {token.columna:<8}")
 
 
+import tkinter as tk
+from tkinter import filedialog
+
+def seleccionar_archivo():
+    root = tk.Tk()
+    root.withdraw()
+
+    archivo = filedialog.askopenfilename(
+        title="Seleccionar archivo .smart",
+        filetypes=[("Archivos SMART", "*.smart")]
+    )
+    return archivo
+
 def main():
-    if len(sys.argv) != 2:
-        print("Uso: python lexer.py archivo.smart")
-        return
-
-    ruta_archivo = sys.argv[1]
-
     try:
+        ruta_archivo = seleccionar_archivo()
+
+        if not ruta_archivo:
+            print("No se seleccionó ningún archivo.")
+            return
+
         codigo = leer_archivo(ruta_archivo)
         tokens = lexer(codigo)
+
         imprimir_tokens(tokens)
-        print("\nAnálisis léxico exitoso: archivo correctamente codificado.")
+        print("\nAnálisis léxico exitoso.")
+
     except (ValueError, FileNotFoundError, SyntaxError) as e:
         print(e)
 
-
+if __name__ == "__main__":
+    main()
 import tkinter as tk
 from tkinter import filedialog
 
@@ -160,25 +176,3 @@ def seleccionar_archivo():
 
     return archivo
 
-
-def main():
-    try:
-        ruta_archivo = seleccionar_archivo()
-
-        if not ruta_archivo:
-            print("No se seleccionó ningún archivo.")
-            return
-
-        codigo = leer_archivo(ruta_archivo)
-        tokens = lexer(codigo)
-
-        imprimir_tokens(tokens)
-
-        print("\nAnálisis léxico exitoso.")
-
-    except (ValueError, FileNotFoundError, SyntaxError) as e:
-        print(e)
-
-
-if __name__ == "__main__":
-    main()
