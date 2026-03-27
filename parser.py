@@ -78,7 +78,16 @@ class Parser:
         elif self.coincide("IF"):
             self.if_stmt()
         elif self.coincide("ID"):
-            self.asignacion()
+            token_actual = self.actual()
+
+            # mirar si parece realmente una asignación: ID . ID = ...
+            if self.pos + 1 < len(self.tokens) and self.tokens[self.pos + 1].tipo == "DOT":
+                self.asignacion()
+            else:
+                raise ParserError(
+                    f"Error sintáctico en línea {token_actual.linea}, columna {token_actual.columna}: "
+                    f"sentencia no válida '{token_actual.valor}'. "
+                )
         else:
             token = self.actual()
             if token is None:
