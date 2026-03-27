@@ -1,6 +1,7 @@
 import re
-import sys
 from dataclasses import dataclass
+import tkinter as tk
+from tkinter import filedialog
 
 
 @dataclass
@@ -129,9 +130,6 @@ def imprimir_tokens(tokens: list[Token]) -> None:
         print(f"{token.tipo:<15} {token.valor:<30} {token.linea:<8} {token.columna:<8}")
 
 
-import tkinter as tk
-from tkinter import filedialog
-
 def seleccionar_archivo():
     root = tk.Tk()
     root.withdraw()
@@ -142,7 +140,8 @@ def seleccionar_archivo():
     )
     return archivo
 
-def main():
+
+def modo_archivo():
     try:
         ruta_archivo = seleccionar_archivo()
 
@@ -159,20 +158,42 @@ def main():
     except (ValueError, FileNotFoundError, SyntaxError) as e:
         print(e)
 
+
+def modo_interactivo():
+    print("Modo interactivo del lexer.")
+    print("Escribí una línea para analizarla.")
+    print("Escribí 'salir' para terminar.\n")
+
+    while True:
+        entrada = input("smart> ")
+
+        if entrada.strip().lower() == "salir":
+            print("Saliendo del modo interactivo.")
+            break
+
+        try:
+            tokens = lexer(entrada)
+            imprimir_tokens(tokens)
+            print()
+        except SyntaxError as e:
+            print(e)
+            print()
+
+
+def main():
+    print("Seleccione modo de ejecución:")
+    print("1. Analizar archivo .smart")
+    print("2. Modo interactivo")
+
+    opcion = input("Opción: ").strip()
+
+    if opcion == "1":
+        modo_archivo()
+    elif opcion == "2":
+        modo_interactivo()
+    else:
+        print("Opción no válida.")
+
+
 if __name__ == "__main__":
     main()
-import tkinter as tk
-from tkinter import filedialog
-
-
-def seleccionar_archivo():
-    root = tk.Tk()
-    root.withdraw()  # oculta la ventana principal
-
-    archivo = filedialog.askopenfilename(
-        title="Seleccionar archivo .smart",
-        filetypes=[("Archivos SMART", "*.smart")]
-    )
-
-    return archivo
-

@@ -1,11 +1,35 @@
-// El sensor de luz activa el foco
+// El sensor de luz (entrada) activa el foco (salida)
 WHEN sensor_luz < 250lux DO
 foco_entrada.estado = ON
 foco_entrada.brillo = 80%
+foco_patio.estado = ON
+foco_patio.color = blue
 END
-
+// Gestión inteligente del aire acondicionado
+WHEN sensor_movimiento == TRUE DO
+IF sensor_temp_int > 26°C THEN
+aire_acondicionado.estado = ON
+aire_acondicionado.modo = FRIO
+aire_acondicionado.temp_objetivo = 22°C
+ELSE
+aire_acondicionado.estado = OFF
+END
+END
 EVERY 30m DO
 IF reloj.hora > 22:00 AND alarma.estado == OFF THEN
-altavoz_comedor.mensaje = "Hora de dormir"
+ persiana_sala.posicion = 0%
+ cerradura_principal.estado = ON
+ altavoz_comedor.volumen = 0%
+ altavoz_comedor.mensaje = “Son las 22hs, hora de dormir”
+ altavoz_comedor.email = felipe@smart-home.com.ar
+ END
 END
-EN
+IF sensor_humo == TRUE AND aire_acondicionado.estado == OFF THEN
+aire_acondicionado.estado = ON
+aire_acondicionado.modo = FRIO
+aire_acondicionado.temp_objetivo = 22°C
+cerradura_principal.estado = OFF
+persiana_comedor.posicion =100%
+ altavoz_comedor.mensaje = “PELIGRO. HUMO DETECTADO”
+ altavoz_comedor.email = bomberos@smart-home.com.ar
+END
