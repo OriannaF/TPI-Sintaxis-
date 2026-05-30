@@ -65,15 +65,19 @@ TOKEN_REGEX = [
     ("CERRADURA_ID",          r"\bcerradura(?:_[A-Za-z0-9_]+)?\b"),
     ("ALTAVOZ_ID",            r"\baltavoz(?:_[A-Za-z0-9_]+)?\b"),
     ("ALARMA_ID",             r"\balarma(?:_[A-Za-z0-9_]+)?\b"),
-    ("SENSOR_TEMPERATURA_ID", r"\bsensor_temperatura(?:_[A-Za-z0-9_]+)?\b"),
+    ("SENSOR_TEMPERATURA_ID", r"\bsensor_t(?:emperatura|emp)(?:_[A-Za-z0-9_]+)?\b"),
     ("SENSOR_HUMEDAD_ID",     r"\bsensor_humedad(?:_[A-Za-z0-9_]+)?\b"),
     ("SENSOR_LUZ_ID",         r"\bsensor_luz(?:_[A-Za-z0-9_]+)?\b"),
     ("SENSOR_MOVIMIENTO_ID",  r"\bsensor_movimiento(?:_[A-Za-z0-9_]+)?\b"),
     ("SENSOR_HUMO_ID",        r"\bsensor_humo(?:_[A-Za-z0-9_]+)?\b"),
     ("RELOJ_ID",              r"\breloj(?:_[A-Za-z0-9_]+)?\b"),
 
-    # atributos del dominio
-    ("ATRIBUTO",     r"\b(?:estado|brillo|color|modo|temp_obj|temp_act|posicion|volumen|mute|mensaje|email_notif|activada|hora|fecha)\b"),
+    # atributos específicos del reloj (separados para validación en parser)
+    ("ATTR_HORA",    r"\bhora\b"),
+    ("ATTR_FECHA",   r"\bfecha\b"),
+
+    # atributos del dominio (sin hora ni fecha, que tienen su propio token)
+    ("ATRIBUTO",     r"\b(?:estado|brillo|color|modo|temp_obj|temp_act|posicion|volumen|mute|mensaje|email_notif|activada)\b"),
 
     # identificadores genericos
     ("ID",           r"[A-Za-z_][A-Za-z0-9_]*"),

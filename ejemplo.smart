@@ -1,23 +1,47 @@
-EVERY 30m DO
-IF reloj.hora > 22:00 AND alarma.estado == OFF THEN
-altavoz_comedor.mensaje = "Hora de dormir"
-END
-END
-
-WHEN sensor_temperatura_cocina.temp_obj > 30°C DO
+// Sensor de temperatura activa el aire acondicionado
+WHEN sensor_temp_cocina > 30°C DO
+aire_comedor.estado = ON
 aire_comedor.modo = FRIO
 aire_comedor.temp_obj = 24°C
 END
 
-IF sensor_humedad_jardin.activada == TRUE THEN
-foco_jardin.brillo = 75%
+// Sensor de humedad programa el riego
+WHEN sensor_humedad_jardin < 30% DO
+foco_jardin.estado = ON
 END
 
-WHEN sensor_luz_entrada.color != ON DO
+// Sensor de luz controla las persianas
+WHEN sensor_luz_entrada < 100lux DO
 persiana_sala.posicion = 50%
 END
 
-EVERY 1h DO
-alarma.volumen = 80%
-reloj.email_notif = "admin@casa.com"
+// Programación nocturna cada 30 minutos
+EVERY 30m DO
+IF reloj.hora > 22:00 AND cerradura_principal.estado == OFF THEN
+altavoz_comedor.mensaje = "Hora de dormir"
+altavoz_comedor.volumen = 0%
+END
+END
+
+// Sensor de movimiento activa alarma
+WHEN sensor_movimiento == ON DO
+alarma.estado = ON
+alarma.activada = TRUE
+END
+
+// Doble condición: humo Y aire apagado → emergencia
+IF sensor_humo == ON AND NOT aire_comedor.estado == ON THEN
+aire_comedor.estado = ON
+aire_comedor.modo = FRIO
+cerradura_principal.estado = OFF
+persiana_comedor.posicion = 100%
+altavoz_comedor.mensaje = "PELIGRO: HUMO DETECTADO"
+altavoz_comedor.email_notif = bomberos@smart-home.com.ar
+END
+
+// Ambientación a las 20:00 en punto
+EVERY 20:00 DO
+persiana_sala.posicion = 0%
+altavoz_comedor.volumen = 50%
+altavoz_comedor.mensaje = "Buenas noches"
 END
