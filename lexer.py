@@ -13,24 +13,20 @@ class Token:
 
 
 TOKEN_REGEX = [
-    # comentarios y espacios
     ("COMMENT",      r"//[^\n]*"),
     ("NEWLINE",      r"\n"),
     ("SKIP",         r"[ \t\r]+"),
 
-    # operadores dobles
     ("EQ",           r"=="),
     ("NEQ",          r"!="),
     ("GE",           r">="),
     ("LE",           r"<="),
 
-    # operadores simples
     ("GT",           r">"),
     ("LT",           r"<"),
     ("ASSIGN",       r"="),
     ("DOT",          r"\."),
 
-    # literales compuestos
     ("TEMPERATURA",  r"-?\d+(?:\.\d+)?°C"),
     ("PORCENTAJE",   r"\d+(?:\.\d+)?%"),
     ("ILUMINANCIA",  r"\d+(?:\.\d+)?lux"),
@@ -40,7 +36,6 @@ TOKEN_REGEX = [
     ("EMAIL",        r"[A-Za-z0-9._+\-]+@[A-Za-z0-9._+\-]+\.[A-Za-z]{2,4}"),
     ("TEXTO",        r'"[^"\n]*"|\'[^\'\n]*\''),
 
-    # palabras reservadas
     ("WHEN",         r"\bWHEN\b"),
     ("IF",           r"\bIF\b"),
     ("THEN",         r"\bTHEN\b"),
@@ -52,16 +47,10 @@ TOKEN_REGEX = [
     ("OR",           r"\bOR\b"),
     ("NOT",          r"\bNOT\b"),
 
-    # booleanos
     ("BOOLEANO",     r"\b(?:TRUE|FALSE|ON|OFF)\b"),
-
-    # modos de aire
     ("MODO_AIRE",    r"\b(?:FRIO|CALOR|VENT)\b"),
-
-    # colores (terminal VALOR_COLOR: blanco, rojo, azul)
     ("VALOR_COLOR",  r"\b(?:blanco|rojo|azul)\b"),
 
-    # ids de dispositivos actuadores (requieren _sufijo)
     ("FOCO_ID",               r"\bfoco_[A-Za-z0-9_]+\b"),
     ("AIRE_ID",               r"\baire_[A-Za-z0-9_]+\b"),
     ("PERSIANA_ID",           r"\bpersiana_[A-Za-z0-9_]+\b"),
@@ -75,10 +64,8 @@ TOKEN_REGEX = [
     ("SENSOR_HUMO_ID",        r"\bsensor_humo(?:_[A-Za-z0-9_]+)?\b"),
     ("RELOJ_ID",              r"\breloj(?:_[A-Za-z0-9_]+)?\b"),
 
-    # atributos del dominio (incluye hora, fecha, email, temp_objetivo)
     ("ATRIBUTO",     r"\b(?:estado|brillo|color|modo|temp_obj|temp_objetivo|temp_act|posicion|volumen|mute|mensaje|email_notif|email|activada|hora|fecha)\b"),
 
-    # identificadores genericos
     ("ID",           r"[A-Za-z_][A-Za-z0-9_]*"),
 ]
 

@@ -18,14 +18,12 @@ class ASTNode:
 
 
 class Program(ASTNode):
-    """programa → lista_sentencias (4.4.1)"""
     __slots__ = ('statements',)
     def __init__(self, statements: list):
         self.statements = statements
 
 
 class WhenStmt(ASTNode):
-    """when → WHEN condicion DO bloque END (4.4.4)"""
     __slots__ = ('condition', 'body')
     def __init__(self, condition, body: list):
         self.condition = condition
@@ -33,7 +31,6 @@ class WhenStmt(ASTNode):
 
 
 class EveryStmt(ASTNode):
-    """every → EVERY tiempo DO bloque END (4.4.5)"""
     __slots__ = ('tiempo', 'body')
     def __init__(self, tiempo, body: list):
         self.tiempo = tiempo
@@ -41,7 +38,6 @@ class EveryStmt(ASTNode):
 
 
 class IfStmt(ASTNode):
-    """if → IF condicion THEN bloque [ ELSE bloque ] END (4.4.6)"""
     __slots__ = ('condition', 'then_body', 'else_body')
     def __init__(self, condition, then_body: list, else_body: list = None):
         self.condition = condition
@@ -50,7 +46,6 @@ class IfStmt(ASTNode):
 
 
 class AssignStmt(ASTNode):
-    """asignacion → asignacion_foco | asignacion_aire | ... (4.4.7)"""
     __slots__ = ('device', 'attribute', 'value', 'device_tipo')
     def __init__(self, device: str, attribute: str, value, device_tipo: str):
         self.device = device
@@ -60,8 +55,6 @@ class AssignStmt(ASTNode):
 
 
 class BinaryOp(ASTNode):
-    """expresion_or → expresion_and { OR expresion_and } (4.4.10)
-       expresion_and → expresion_not { AND expresion_not } (4.4.11)"""
     __slots__ = ('operator', 'left', 'right')
     def __init__(self, operator: str, left, right):
         self.operator = operator
@@ -70,7 +63,6 @@ class BinaryOp(ASTNode):
 
 
 class UnaryOp(ASTNode):
-    """expresion_not → NOT expresion_not (4.4.12)"""
     __slots__ = ('operator', 'operand')
     def __init__(self, operator: str, operand):
         self.operator = operator
@@ -78,7 +70,6 @@ class UnaryOp(ASTNode):
 
 
 class Comparison(ASTNode):
-    """comparacion → comparacion_temp | comparacion_hum | ... (4.4.14)"""
     __slots__ = ('left', 'operator', 'right', 'device_tipo')
     def __init__(self, left, operator: str, right, device_tipo: str = None):
         self.left = left
@@ -88,7 +79,6 @@ class Comparison(ASTNode):
 
 
 class Reference(ASTNode):
-    """referencia → identificador [ DOT atributo ]"""
     __slots__ = ('base', 'attribute')
     def __init__(self, base: str, attribute: str = None):
         self.base = base
@@ -96,7 +86,6 @@ class Reference(ASTNode):
 
 
 class Literal(ASTNode):
-    """valor → BOOLEANO | PORCENTAJE | TEMPERATURA | ..."""
     __slots__ = ('tipo', 'valor')
     def __init__(self, tipo: str, valor: str):
         self.tipo = tipo
@@ -107,8 +96,6 @@ class Literal(ASTNode):
 # Tablas de validación (gramática 4.4.7 y 4.4.14)
 # ============================================================
 
-# 4.4.7: asignacion → asignacion_foco | asignacion_aire | ...
-# Cada dispositivo mide qué atributos acepta y qué tipo de valor debe tener cada uno.
 ASIGNACIONES = {
     "FOCO_ID": {
         "estado": ("BOOLEANO",),
@@ -140,8 +127,6 @@ ASIGNACIONES = {
     },
 }
 
-# 4.4.14: comparacion → comparacion_temp | comparacion_hum | ...
-# Sensores: se comparan sin DOT, solo SENSOR_ID OPERADOR TIPO_VALOR
 COMPARACION_SENSORES = {
     "SENSOR_TEMPERATURA_ID": ("TEMPERATURA",),
     "SENSOR_HUMEDAD_ID": ("PORCENTAJE",),
@@ -150,7 +135,6 @@ COMPARACION_SENSORES = {
     "SENSOR_HUMO_ID": ("BOOLEANO",),
 }
 
-# Actuadores en comparación: deben usar DOT + atributo + tipo de valor específico
 COMPARACION_ACTUADORES = {
     "FOCO_ID": {
         "estado": ("BOOLEANO",),
@@ -179,13 +163,11 @@ COMPARACION_ACTUADORES = {
     },
 }
 
-# RELOJ_ID en comparación: DOT obligatorio, solo hora/fecha
 COMPARACION_RELOJ = {
     "hora": ("HORA",),
     "fecha": ("FECHA",),
 }
 
-# Conjunto de tokens que pueden iniciar una sentencia
 FIRST_SENTENCIA = {
     "WHEN", "EVERY", "IF",
     "FOCO_ID", "AIRE_ID", "PERSIANA_ID", "CERRADURA_ID",
@@ -337,8 +319,6 @@ class Parser:
         self.consumir("END")
         return IfStmt(cond, then_body, else_body)
 
-    # 4.4.7: asignacion → asignacion_foco | asignacion_aire | ...
-    #         Cada una con validación de atributo y tipo de valor.
     def asignacion(self) -> AssignStmt:
         device_token = self.actual()
         device_tipo = device_token.tipo
@@ -431,7 +411,6 @@ class Parser:
         if token is None:
             raise ParserError("Error sintáctico: se esperaba una condición y se llegó al fin del archivo.")
 
-        # --- Sensor (sin DOT) ---
         if token.tipo in COMPARACION_SENSORES:
             id_tok = self.consumir(token.tipo)
             op_tok = self.operador()
@@ -445,7 +424,6 @@ class Parser:
                 )
             return Comparison(Reference(id_tok.valor), op_tok.valor, val, token.tipo)
 
-        # --- RELOJ_ID (DOT obligatorio, solo hora/fecha) ---
         if token.tipo == "RELOJ_ID":
             id_tok = self.consumir("RELOJ_ID")
             if not self.coincide("DOT"):
@@ -475,7 +453,6 @@ class Parser:
                 )
             return Comparison(Reference(id_tok.valor, attr_token.valor), op_tok.valor, val, "RELOJ_ID")
 
-        # --- Actuador en comparación (DOT obligatorio) ---
         if token.tipo in COMPARACION_ACTUADORES:
             id_tok = self.consumir(token.tipo)
             if not self.coincide("DOT"):
