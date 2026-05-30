@@ -1,0 +1,16 @@
+// error_tipado.smart
+
+// Error 1: Intentar asignarle un valor a un sensor (¡Son de solo lectura!)
+WHEN sensor_movimiento == TRUE DO
+    sensor_movimiento = FALSE
+END
+
+// Error 2: Comparador relacional (>) con un tipo booleano 
+WHEN sensor_humo > FALSE DO
+    alarma_casa.activada = ON
+END
+
+// Error 3: Asignar un color que no está en la regla VALOR_COLOR (solo blanco, rojo, azul)
+EVERY 12h DO
+    foco_pasillo.color = verde
+END

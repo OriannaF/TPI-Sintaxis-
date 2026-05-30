@@ -1,0 +1,16 @@
+// error_lexico.smart
+
+// Error 1: Unidad de tiempo inventada (30x en lugar de s, m, h)
+EVERY 30x DO
+    foco_sala.brillo = 50%
+END
+
+// Error 2: Email con extensión inválida (tiene más de 4 letras)
+WHEN sensor_humo == TRUE DO
+    altavoz_alerta.email_notif = emergencias@barrio.comunidad
+END
+
+// Error 3: Identificador de actuador sin el guion bajo obligatorio
+WHEN sensor_luz < 100lux DO
+    focojardin.estado = ON
+END

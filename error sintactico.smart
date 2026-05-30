@@ -1,0 +1,18 @@
+// error_sintactico.smart
+
+// Error 1: Falta la palabra reservada 'DO' antes del bloque
+WHEN sensor_temp > 28.5°C
+    aire_habitacion.estado = ON
+    aire_habitacion.modo = FRIO
+END
+
+// Error 2: Estructura IF incompleta (falta el 'THEN')
+EVERY 1h DO
+    IF reloj.hora == 12:00
+        persiana_comedor.posicion = 100%
+    END
+END
+
+// Error 3: Falta cerrar el bloque EVERY con su 'END'
+EVERY 30m DO
+    alarma_principal.estado = ON
