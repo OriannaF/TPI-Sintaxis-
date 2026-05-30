@@ -139,6 +139,8 @@ def lexer(codigo: str) -> list[Token]:
                 "MODO_AIRE", "VALOR_COLOR",
             }:
                 valor = valor.upper()
+            elif tipo == "ATRIBUTO":
+                valor = valor.lower()
 
             tokens.append(Token(tipo, valor, linea, columna))
 
