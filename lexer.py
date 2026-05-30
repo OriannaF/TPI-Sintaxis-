@@ -36,9 +36,9 @@ TOKEN_REGEX = [
     ("ILUMINANCIA",  r"\d+(?:\.\d+)?lux"),
     ("TIEMPO",       r"\d+(?:\.\d+)?[smh]"),
     ("HORA",         r"(?:[01]\d|2[0-3]):[0-5]\d"),
-    ("FECHA",        r"(?:0?[1-9]|[12]\d|3[01])/(?:0?[1-9]|1[0-2])/(?:19\d{2}|20\d{2})"),
+    ("FECHA",        r"(?:(?:0?[1-9]|[12]\d|3[01])/(?:0?[1-9]|1[0-2])/(?:19\d{2}|20\d{2}))|(?:(?:19\d{2}|20\d{2})-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01]))"),
     ("EMAIL",        r"[A-Za-z0-9._+\-]+@[A-Za-z0-9._+\-]+\.[A-Za-z]{2,4}"),
-    ("TEXTO",        r'"[^"\n]*"|“[^”\n]*”'),
+    ("TEXTO",        r'"[^"\n]*"|\'[^\'\n]*\''),
 
     # palabras reservadas
     ("WHEN",         r"\bWHEN\b"),
@@ -55,7 +55,27 @@ TOKEN_REGEX = [
     # booleanos
     ("BOOLEANO",     r"\b(?:TRUE|FALSE|ON|OFF)\b"),
 
-    # identificadores
+    # modos de aire
+    ("MODO_AIRE",    r"\b(?:FRIO|CALOR|VENT)\b"),
+
+    # ids de dispositivos (antes de ID generico para ganar por orden)
+    ("FOCO_ID",               r"\bfoco(?:_[A-Za-z0-9_]+)?\b"),
+    ("AIRE_ID",               r"\baire(?:_[A-Za-z0-9_]+)?\b"),
+    ("PERSIANA_ID",           r"\bpersiana(?:_[A-Za-z0-9_]+)?\b"),
+    ("CERRADURA_ID",          r"\bcerradura(?:_[A-Za-z0-9_]+)?\b"),
+    ("ALTAVOZ_ID",            r"\baltavoz(?:_[A-Za-z0-9_]+)?\b"),
+    ("ALARMA_ID",             r"\balarma(?:_[A-Za-z0-9_]+)?\b"),
+    ("SENSOR_TEMPERATURA_ID", r"\bsensor_temperatura(?:_[A-Za-z0-9_]+)?\b"),
+    ("SENSOR_HUMEDAD_ID",     r"\bsensor_humedad(?:_[A-Za-z0-9_]+)?\b"),
+    ("SENSOR_LUZ_ID",         r"\bsensor_luz(?:_[A-Za-z0-9_]+)?\b"),
+    ("SENSOR_MOVIMIENTO_ID",  r"\bsensor_movimiento(?:_[A-Za-z0-9_]+)?\b"),
+    ("SENSOR_HUMO_ID",        r"\bsensor_humo(?:_[A-Za-z0-9_]+)?\b"),
+    ("RELOJ_ID",              r"\breloj(?:_[A-Za-z0-9_]+)?\b"),
+
+    # atributos del dominio (antes de ID para que ganen)
+    ("ATRIBUTO",     r"\b(?:estado|brillo|color|modo|temp_obj|temp_act|posicion|volumen|mute|mensaje|email_notif|activada|hora|fecha)\b"),
+
+    # identificadores genericos
     ("ID",           r"[A-Za-z_][A-Za-z0-9_]*"),
 ]
 
@@ -112,7 +132,7 @@ def lexer(codigo: str) -> list[Token]:
         else:
             if tipo in {
                 "WHEN", "IF", "THEN", "ELSE", "DO", "END",
-                "EVERY", "AND", "OR", "NOT", "BOOLEANO"
+                "EVERY", "AND", "OR", "NOT", "BOOLEANO", "MODO_AIRE"
             }:
                 valor = valor.upper()
 

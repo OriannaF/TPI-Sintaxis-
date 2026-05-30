@@ -31,21 +31,23 @@ class Parser:
         token = self.actual()
         return token is not None and token.tipo in tipos
 
-    def consumir(self, tipo_esperado):
+    def consumir(self, *tipos_esperados):
         token = self.actual()
 
         if token is None:
             raise ParserError(
-                f"Error sintáctico: se esperaba '{tipo_esperado}' pero se llegó al fin del archivo."
+                f"Error sintáctico: se esperaba '{tipos_esperados[0] if len(tipos_esperados) == 1 else tipos_esperados}' "
+                f"pero se llegó al fin del archivo."
             )
 
-        if token.tipo == tipo_esperado:
+        if token.tipo in tipos_esperados:
             self.pos += 1
             return token
 
         raise ParserError(
             f"Error sintáctico en línea {token.linea}, columna {token.columna}: "
-            f"se esperaba '{tipo_esperado}' y se encontró '{token.valor}'"
+            f"se esperaba '{tipos_esperados[0] if len(tipos_esperados) == 1 else tipos_esperados}' "
+            f"y se encontró '{token.valor}'"
         )
 
     # =========================
@@ -67,7 +69,12 @@ class Parser:
     def lista_sentencias(self):
         self.sentencia()
 
-        while self.coincide("WHEN", "EVERY", "IF", "ID"):
+        while self.coincide("WHEN", "EVERY", "IF", "ID",
+                            "FOCO_ID", "AIRE_ID", "PERSIANA_ID", "CERRADURA_ID",
+                            "ALTAVOZ_ID", "ALARMA_ID",
+                            "SENSOR_TEMPERATURA_ID", "SENSOR_HUMEDAD_ID",
+                            "SENSOR_LUZ_ID", "SENSOR_MOVIMIENTO_ID", "SENSOR_HUMO_ID",
+                            "RELOJ_ID"):
             self.sentencia()
 
     def sentencia(self):
@@ -77,7 +84,11 @@ class Parser:
             self.every_stmt()
         elif self.coincide("IF"):
             self.if_stmt()
-        elif self.coincide("ID"):
+        elif self.coincide("ID", "FOCO_ID", "AIRE_ID", "PERSIANA_ID", "CERRADURA_ID",
+                             "ALTAVOZ_ID", "ALARMA_ID",
+                             "SENSOR_TEMPERATURA_ID", "SENSOR_HUMEDAD_ID",
+                             "SENSOR_LUZ_ID", "SENSOR_MOVIMIENTO_ID", "SENSOR_HUMO_ID",
+                             "RELOJ_ID"):
             token_actual = self.actual()
 
             # mirar si parece realmente una asignación: ID . ID = ...
@@ -135,7 +146,12 @@ class Parser:
     def bloque(self):
         self.sentencia()
 
-        while self.coincide("WHEN", "EVERY", "IF", "ID"):
+        while self.coincide("WHEN", "EVERY", "IF", "ID",
+                            "FOCO_ID", "AIRE_ID", "PERSIANA_ID", "CERRADURA_ID",
+                            "ALTAVOZ_ID", "ALARMA_ID",
+                            "SENSOR_TEMPERATURA_ID", "SENSOR_HUMEDAD_ID",
+                            "SENSOR_LUZ_ID", "SENSOR_MOVIMIENTO_ID", "SENSOR_HUMO_ID",
+                            "RELOJ_ID"):
             self.sentencia()
 
     # =========================
@@ -233,6 +249,12 @@ class Parser:
             "EMAIL",
             "ILUMINANCIA",
             "ID",
+            "MODO_AIRE",
+            "FOCO_ID", "AIRE_ID", "PERSIANA_ID", "CERRADURA_ID",
+            "ALTAVOZ_ID", "ALARMA_ID",
+            "SENSOR_TEMPERATURA_ID", "SENSOR_HUMEDAD_ID",
+            "SENSOR_LUZ_ID", "SENSOR_MOVIMIENTO_ID", "SENSOR_HUMO_ID",
+            "RELOJ_ID",
         }
 
         if token is None:
@@ -251,10 +273,14 @@ class Parser:
         }
 
     def identificador(self):
-        return self.consumir("ID")
+        return self.consumir("ID", "FOCO_ID", "AIRE_ID", "PERSIANA_ID", "CERRADURA_ID",
+                             "ALTAVOZ_ID", "ALARMA_ID",
+                             "SENSOR_TEMPERATURA_ID", "SENSOR_HUMEDAD_ID",
+                             "SENSOR_LUZ_ID", "SENSOR_MOVIMIENTO_ID", "SENSOR_HUMO_ID",
+                             "RELOJ_ID")
 
     def atributo(self):
-        return self.consumir("ID")
+        return self.consumir("ATRIBUTO", "ID")
 
     def tiempo(self):
         return self.consumir("TIEMPO")

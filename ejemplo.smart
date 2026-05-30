@@ -3,3 +3,21 @@ IF reloj.hora > 22:00 AND alarma.estado == OFF THEN
 altavoz_comedor.mensaje = "Hora de dormir"
 END
 END
+
+WHEN sensor_temperatura_cocina.temp_obj > 30°C DO
+aire_comedor.modo = FRIO
+aire_comedor.temp_obj = 24°C
+END
+
+IF sensor_humedad_jardin.activada == TRUE THEN
+foco_jardin.brillo = 75%
+END
+
+WHEN sensor_luz_entrada.color != ON DO
+persiana_sala.posicion = 50%
+END
+
+EVERY 1h DO
+alarma.volumen = 80%
+reloj.email_notif = "admin@casa.com"
+END
