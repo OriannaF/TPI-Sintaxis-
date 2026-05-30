@@ -113,7 +113,7 @@ ASIGNACIONES = {
     "FOCO_ID": {
         "estado": ("BOOLEANO",),
         "brillo": ("PORCENTAJE",),
-        "color": ("TEXTO", "ID"),
+        "color": ("VALOR_COLOR",),
     },
     "AIRE_ID": {
         "estado": ("BOOLEANO",),
@@ -155,13 +155,12 @@ COMPARACION_ACTUADORES = {
     "FOCO_ID": {
         "estado": ("BOOLEANO",),
         "brillo": ("PORCENTAJE",),
-        "color": ("TEXTO",),
+        "color": ("VALOR_COLOR",),
     },
     "AIRE_ID": {
         "estado": ("BOOLEANO",),
         "modo": ("MODO_AIRE",),
         "temp_obj": ("TEMPERATURA",),
-        "temp_objetivo": ("TEMPERATURA",),
         "temp_act": ("TEMPERATURA",),
     },
     "PERSIANA_ID": {
@@ -173,7 +172,6 @@ COMPARACION_ACTUADORES = {
     "ALTAVOZ_ID": {
         "volumen": ("PORCENTAJE",),
         "mute": ("BOOLEANO",),
-        "email": ("EMAIL",),
     },
     "ALARMA_ID": {
         "estado": ("BOOLEANO",),
@@ -181,10 +179,10 @@ COMPARACION_ACTUADORES = {
     },
 }
 
-# RELOJ_ID en comparación: DOT obligatorio, solo ATTR_HORA/ATTR_FECHA
+# RELOJ_ID en comparación: DOT obligatorio, solo hora/fecha
 COMPARACION_RELOJ = {
-    "ATTR_HORA": ("HORA",),
-    "ATTR_FECHA": ("FECHA",),
+    "hora": ("HORA",),
+    "fecha": ("FECHA",),
 }
 
 # Conjunto de tokens que pueden iniciar una sentencia
@@ -427,15 +425,6 @@ class Parser:
 
     # -------- Comparaciones (4.4.14) --------
 
-    def _validar_comparacion_valor(self, token, device_tipo, attr, val, tipos_permitidos):
-        """Lanza error si el tipo de valor no coincide con lo esperado."""
-        if val.tipo not in tipos_permitidos:
-            contexto = f"{token.valor}.{attr}" if attr else token.valor
-            raise ParserError(
-                f"Error sintáctico en línea {val.linea(self.tokens, self.pos)}:\n"
-
-            )
-
     # 4.4.14: comparacion → comparacion_sensor | comparacion_reloj | comparacion_actuador
     def comparacion(self) -> Comparison:
         token = self.actual()
@@ -456,7 +445,7 @@ class Parser:
                 )
             return Comparison(Reference(id_tok.valor), op_tok.valor, val, token.tipo)
 
-        # --- RELOJ_ID (DOT obligatorio, solo ATTR_HORA/ATTR_FECHA) ---
+        # --- RELOJ_ID (DOT obligatorio, solo hora/fecha) ---
         if token.tipo == "RELOJ_ID":
             id_tok = self.consumir("RELOJ_ID")
             if not self.coincide("DOT"):
@@ -468,7 +457,7 @@ class Parser:
             self.consumir("DOT")
             attr_token = self.atributo()
 
-            if attr_token.tipo not in ("ATTR_HORA", "ATTR_FECHA"):
+            if attr_token.valor not in COMPARACION_RELOJ:
                 raise ParserError(
                     f"Error sintáctico en línea {attr_token.linea}, columna {attr_token.columna}: "
                     f"el atributo '{attr_token.valor}' no es válido para '{id_tok.valor}'. "
@@ -477,7 +466,7 @@ class Parser:
 
             op_tok = self.operador()
             val = self.valor()
-            tipos_esperados = COMPARACION_RELOJ[attr_token.tipo]
+            tipos_esperados = COMPARACION_RELOJ[attr_token.valor]
             if val.tipo not in tipos_esperados:
                 raise ParserError(
                     f"Error sintáctico en línea {token.linea}, columna {token.columna}: "
@@ -528,7 +517,8 @@ class Parser:
     def valor(self) -> Literal:
         tipos_validos = {
             "BOOLEANO", "PORCENTAJE", "TEMPERATURA", "TIEMPO", "TEXTO",
-            "HORA", "FECHA", "EMAIL", "ILUMINANCIA", "MODO_AIRE",
+            "HORA", "FECHA", "EMAIL", "ILUMINANCIA", "MODO_AIRE", "ID",
+            "VALOR_COLOR",
         }
         t = self.actual()
         if t is None:
@@ -582,7 +572,7 @@ class Parser:
     # -------- Atributo --------
 
     def atributo(self) -> Token:
-        return self.consumir("ATRIBUTO", "ATTR_HORA", "ATTR_FECHA")
+        return self.consumir("ATRIBUTO", "ID")
 
     # -------- Tiempo (4.4.15) --------
 

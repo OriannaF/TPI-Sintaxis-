@@ -58,12 +58,15 @@ TOKEN_REGEX = [
     # modos de aire
     ("MODO_AIRE",    r"\b(?:FRIO|CALOR|VENT)\b"),
 
-    # ids de dispositivos
-    ("FOCO_ID",               r"\bfoco(?:_[A-Za-z0-9_]+)?\b"),
-    ("AIRE_ID",               r"\baire(?:_[A-Za-z0-9_]+)?\b"),
-    ("PERSIANA_ID",           r"\bpersiana(?:_[A-Za-z0-9_]+)?\b"),
-    ("CERRADURA_ID",          r"\bcerradura(?:_[A-Za-z0-9_]+)?\b"),
-    ("ALTAVOZ_ID",            r"\baltavoz(?:_[A-Za-z0-9_]+)?\b"),
+    # colores (terminal VALOR_COLOR: blanco, rojo, azul)
+    ("VALOR_COLOR",  r"\b(?:blanco|rojo|azul)\b"),
+
+    # ids de dispositivos actuadores (requieren _sufijo)
+    ("FOCO_ID",               r"\bfoco_[A-Za-z0-9_]+\b"),
+    ("AIRE_ID",               r"\baire_[A-Za-z0-9_]+\b"),
+    ("PERSIANA_ID",           r"\bpersiana_[A-Za-z0-9_]+\b"),
+    ("CERRADURA_ID",          r"\bcerradura_[A-Za-z0-9_]+\b"),
+    ("ALTAVOZ_ID",            r"\baltavoz_[A-Za-z0-9_]+\b"),
     ("ALARMA_ID",             r"\balarma(?:_[A-Za-z0-9_]+)?\b"),
     ("SENSOR_TEMPERATURA_ID", r"\bsensor_t(?:emperatura|emp)(?:_[A-Za-z0-9_]+)?\b"),
     ("SENSOR_HUMEDAD_ID",     r"\bsensor_humedad(?:_[A-Za-z0-9_]+)?\b"),
@@ -72,12 +75,8 @@ TOKEN_REGEX = [
     ("SENSOR_HUMO_ID",        r"\bsensor_humo(?:_[A-Za-z0-9_]+)?\b"),
     ("RELOJ_ID",              r"\breloj(?:_[A-Za-z0-9_]+)?\b"),
 
-    # atributos específicos del reloj (separados para validación en parser)
-    ("ATTR_HORA",    r"\bhora\b"),
-    ("ATTR_FECHA",   r"\bfecha\b"),
-
-    # atributos del dominio (sin hora ni fecha, que tienen su propio token)
-    ("ATRIBUTO",     r"\b(?:estado|brillo|color|modo|temp_obj|temp_act|posicion|volumen|mute|mensaje|email_notif|activada)\b"),
+    # atributos del dominio (incluye hora, fecha, email, temp_objetivo)
+    ("ATRIBUTO",     r"\b(?:estado|brillo|color|modo|temp_obj|temp_objetivo|temp_act|posicion|volumen|mute|mensaje|email_notif|email|activada|hora|fecha)\b"),
 
     # identificadores genericos
     ("ID",           r"[A-Za-z_][A-Za-z0-9_]*"),
@@ -136,7 +135,8 @@ def lexer(codigo: str) -> list[Token]:
         else:
             if tipo in {
                 "WHEN", "IF", "THEN", "ELSE", "DO", "END",
-                "EVERY", "AND", "OR", "NOT", "BOOLEANO", "MODO_AIRE"
+                "EVERY", "AND", "OR", "NOT", "BOOLEANO",
+                "MODO_AIRE", "VALOR_COLOR",
             }:
                 valor = valor.upper()
 
