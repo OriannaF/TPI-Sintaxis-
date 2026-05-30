@@ -14,14 +14,8 @@ class Parser:
         self.tokens = tokens
         self.pos = 0
         self.source_path = source_path
-
-        # datos para traducción HTML
-        self.sensores = {}   # nombre -> set de descripciones
-        self.actuadores = {} # nombre -> {atributo: valor}
-
-    # =========================
-    # Utilidades básicas parser
-    # =========================
+        self.sensores = {}
+        self.actuadores = {}
     def actual(self):
         if self.pos < len(self.tokens):
             return self.tokens[self.pos]
@@ -50,9 +44,7 @@ class Parser:
             f"y se encontró '{token.valor}'"
         )
 
-    # =========================
-    # Parse principal
-    # =========================
+
     def parse(self):
         self.programa()
 
@@ -91,7 +83,6 @@ class Parser:
                              "RELOJ_ID"):
             token_actual = self.actual()
 
-            # mirar si parece realmente una asignación: ID . ID = ...
             if self.pos + 1 < len(self.tokens) and self.tokens[self.pos + 1].tipo == "DOT":
                 self.asignacion()
             else:
@@ -154,9 +145,7 @@ class Parser:
                             "RELOJ_ID"):
             self.sentencia()
 
-    # =========================
-    # Condiciones
-    # =========================
+
     def condicion(self):
         self.expresion_or()
 
@@ -192,9 +181,7 @@ class Parser:
 
         self.registrar_sensor(ref["texto"], op.valor, val["texto"], val["tipo"])
 
-    # =========================
-    # Componentes
-    # =========================
+
     def referencia(self):
         primer_id = self.identificador()
 
@@ -285,15 +272,11 @@ class Parser:
     def tiempo(self):
         return self.consumir("TIEMPO")
 
-    # =========================
-    # Recolección de datos HTML
-    # =========================
     def es_sensor(self, referencia: str) -> bool:
         base = referencia.split(".")[0].lower()
         return base.startswith("sensor_") or base == "reloj"
 
     def registrar_sensor(self, referencia: str, operador: str, valor: str, tipo_valor: str):
-        # Solo registramos como sensor si parece sensor/reloj
         if not self.es_sensor(referencia):
             return
 
@@ -314,9 +297,7 @@ class Parser:
             "tipo": tipo_valor
         }
 
-    # =========================
-    # Traducción a HTML
-    # =========================
+
     def limpiar_texto(self, texto: str) -> str:
         if len(texto) >= 2:
             if (texto.startswith('"') and texto.endswith('"')) or (texto.startswith("“") and texto.endswith("”")):

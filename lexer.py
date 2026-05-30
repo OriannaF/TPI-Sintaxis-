@@ -58,7 +58,7 @@ TOKEN_REGEX = [
     # modos de aire
     ("MODO_AIRE",    r"\b(?:FRIO|CALOR|VENT)\b"),
 
-    # ids de dispositivos (antes de ID generico para ganar por orden)
+    # ids de dispositivos
     ("FOCO_ID",               r"\bfoco(?:_[A-Za-z0-9_]+)?\b"),
     ("AIRE_ID",               r"\baire(?:_[A-Za-z0-9_]+)?\b"),
     ("PERSIANA_ID",           r"\bpersiana(?:_[A-Za-z0-9_]+)?\b"),
@@ -72,7 +72,7 @@ TOKEN_REGEX = [
     ("SENSOR_HUMO_ID",        r"\bsensor_humo(?:_[A-Za-z0-9_]+)?\b"),
     ("RELOJ_ID",              r"\breloj(?:_[A-Za-z0-9_]+)?\b"),
 
-    # atributos del dominio (antes de ID para que ganen)
+    # atributos del dominio
     ("ATRIBUTO",     r"\b(?:estado|brillo|color|modo|temp_obj|temp_act|posicion|volumen|mute|mensaje|email_notif|activada|hora|fecha)\b"),
 
     # identificadores genericos
